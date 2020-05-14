@@ -1,6 +1,6 @@
 package generation;
 
-import ext.SimplexNoise;
+import ext.SimplexNoiseOctave;
 
 public class MaskGenerator implements Runnable {
 
@@ -47,33 +47,6 @@ public class MaskGenerator implements Runnable {
 	 */
 	public FloatMap getFalloffNoise(FloatMap mask, float maximumValue) {
 		
-	}
-	
-	/*
-	 * Returns a FloatMap of Simplex Noise between -1.0 and 1.0
-	 * Requires the size of the map to be generated, a seed for the generator
-	 * Requires the octaves and persistance value
-	 */
-	public static FloatMap getSimplexNoise(int size, int seed, int octaves, double persistence) {
-		SimplexNoise noise = new SimplexNoise(octaves, persistence, seed);
-
-		float[][] map = new float[size][size];
-		for (int x = 0; x < size; x++) {
-			for (int y = 0; y < size; y++) {
-				float val = (float) noise.getNoise2D(x, y);
-				if (val > 1.0F) {
-					val = 1.0F;
-				}
-				if (val < -1.0F) {
-					val = -1.0F;
-				}
-				map[x][y] = val;
-			}
-		}
-
-		FloatMap fmap = new FloatMap(-1, 1, size);
-		fmap.setMap(map);
-		return fmap;
 	}
 
 }
