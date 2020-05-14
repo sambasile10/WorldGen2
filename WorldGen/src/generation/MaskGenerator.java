@@ -1,9 +1,18 @@
 package generation;
 
+import java.util.Random;
+
 import ext.SimplexNoiseOctave;
 
 public class MaskGenerator implements Runnable {
 
+	private int seed;
+	private Random random;
+	
+	public MaskGenerator(int seed) {
+		this.seed = seed;
+		this.random = new Random(seed);
+	}
 	
 	@Override
 	public void run() {
@@ -46,7 +55,47 @@ public class MaskGenerator implements Runnable {
 	 * Mask must have a range of 0.0 to 1.0
 	 */
 	public FloatMap getFalloffNoise(FloatMap mask, float maximumValue) {
+		//Create SimplexNoiseGenerator
+		SimplexNoiseGenerator noiseGenerator = new SimplexNoiseGenerator(mask.getSize() / 2, this.seed);
+		noiseGenerator.setParameters(10, 0.66);
 		
+		//Start generator as new thread
+		Thread generatorThread = new Thread(noiseGenerator);
+		generatorThread.start();
+		
+		//Wait for generator to finish
+		try {
+			generatorThread.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		FloatMap noiseMap;
+		
+		//Check if the generator succeeded
+		if(noiseGenerator.getStatus() == 1) {
+			noiseMap = noiseGenerator.getFloatMap();
+		} else {
+			//Generation thread failed
+			return mask;
+		}
+		
+		//Combine noise with mask if the value of the mask is less than the maximum given
+		float[][] blendMap = new float[mask.getSize()][mask.getSize()];
+		for(int x = 0; x < mask.getSize(); x++) {
+			for(int y = 0; y < mask.getSize(); y++) {
+				if(mask.getAt(x, y) <= maximumValue) {
+					blendMap[x][y] = (mask.getAt(x, y) * noiseMap.getAt(x, y));
+				} else {
+					blendMap[x][y] = mask.getAt(x, y);
+				}
+			}
+		}
+		
+		//Return blended FloatMap
+		FloatMap fbMap = new FloatMap(mask.getSize(), 0.0F, 1.0F);
+		fbMap.setMap(blendMap);
+		return fbMap;
 	}
 
 }

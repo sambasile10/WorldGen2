@@ -57,6 +57,16 @@ public class FloatMap {
 		return this.MAX_VALUE;
 	}
 	
+	public boolean setMap(float[][] fMap) {
+		if(fMap.length != this.size) {
+			//Sizes don't match, return false
+			return false;
+		} else {
+			this.map = fMap;
+			return true;
+		}
+	}
+	
 	//Changes noise values from -1.0 to 1.0 into 0.0 to 1.0 according to the exponent
 	public void redistributeNoise(float exponent) {
 		for(int x = 0; x < size; x++) {
