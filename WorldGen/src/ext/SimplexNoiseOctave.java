@@ -30,7 +30,7 @@ import java.util.Random;
  *
  */
 
-public class SimplexNoiseOctave {
+public class SimplexNoiseOctave implements Runnable {
 	public static int RANDOMSEED = 0;
 	private static int NUMBEROFSWAPS = 400;
 
@@ -69,7 +69,14 @@ public class SimplexNoiseOctave {
 	private short perm[] = new short[512];
 	private short permMod12[] = new short[512];
 
+	private int seed;
+	
 	public SimplexNoiseOctave(int seed) {
+		this.seed = seed;
+	}
+	
+	@Override
+	public void run() {
 		p = p_supply.clone();
 
 		if (seed == RANDOMSEED) {
