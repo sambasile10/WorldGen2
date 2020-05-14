@@ -23,9 +23,11 @@ public class MapCanvas extends JComponent {
 	//(technically a pointer) to the World object
 	World world;
 	
-	public MapCanvas(World world) {
+	public MapCanvas(int width, int height, World world) {
 		this.world = world;
 		this.worldSize = world.getWorldSize();
+		this.windowWidth = width;
+		this.windowHeight = height;
 	}
 	
 	public void paintComponent(Graphics g) {

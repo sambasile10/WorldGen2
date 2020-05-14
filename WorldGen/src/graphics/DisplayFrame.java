@@ -5,6 +5,8 @@ import java.awt.event.KeyListener;
 
 import javax.swing.JFrame;
 
+import generation.World;
+
 /*
  * JFrame that stores a JCompoment for painting and
  * uses a KeyListener for moving around the map
@@ -13,10 +15,24 @@ import javax.swing.JFrame;
 public class DisplayFrame extends JFrame implements KeyListener {
 	
 	private MapCanvas mapCanvas;
+	private World world;
 	protected int keyViewStep = 10;
+	private int frameWidth, frameHeight, canvasWidth, canvasHeight;
 	
-	public DisplayFrame() {
+	public DisplayFrame(int frameWidth, int frameHeight, World world) {
+		this.frameWidth = frameWidth;
+		this.frameHeight = frameHeight;
+		this.world = world;
 		
+		this.setTitle("Display of World [seed=" + world.getWorldSeed() + ", size=" + world.getWorldSize() + "]");
+		this.setSize(frameWidth, frameHeight);
+		this.setResizable(false);
+		
+		
+		mapCanvas = new MapCanvas(frameWidth - 100, frameHeight - 50, world);
+		this.add(mapCanvas);
+		this.setEnabled(true);
+		this.setVisible(true);
 	}
 
 	@Override

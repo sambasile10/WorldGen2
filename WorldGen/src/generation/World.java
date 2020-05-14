@@ -9,13 +9,14 @@ public class World {
 	
 	private FloatMap elevationMap, temperatureMap;
 	private Biome[][] biomeMap;
-	private int worldSize;
+	private int worldSize, worldSeed;
 	
-	public World(FloatMap eMap, FloatMap tMap, Biome[][] biomeMap) {
+	public World(int worldSeed, FloatMap eMap, FloatMap tMap, Biome[][] biomeMap) {
 		this.elevationMap = eMap;
 		this.temperatureMap = tMap;
 		this.biomeMap = biomeMap;
 		this.worldSize = biomeMap.length;
+		this.worldSeed = worldSeed;
 	}
 
 	public FloatMap getElevationMap() {
@@ -48,6 +49,14 @@ public class World {
 
 	public void setWorldSize(int worldSize) {
 		this.worldSize = worldSize;
+	}
+
+	public int getWorldSeed() {
+		return worldSeed;
+	}
+
+	public void setWorldSeed(int worldSeed) {
+		this.worldSeed = worldSeed;
 	}
 
 }
