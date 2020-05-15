@@ -47,6 +47,7 @@ public class MaskGenerator implements Runnable {
 		return mask;
 	}
 	
+	
 	/*
 	 * Returns a noise-derived falloff map to randomize masks further
 	 * Requires the FloatMap for the mask to be modified and a float for the
