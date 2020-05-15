@@ -9,7 +9,7 @@ public class SimplexNoiseGenerator implements Runnable {
 	/*
 	 * Generator variables
 	 */
-	private int hSize, aSize, seed, numOctaves;
+	private int size, seed, numOctaves;
 	private double persistence;
 	private Random random;
 	private boolean isInitialized = false;
@@ -37,13 +37,11 @@ public class SimplexNoiseGenerator implements Runnable {
 	
 	/*
 	 * Generates a Generator thread, size is a message of (0 to x+, -x to 0, etc)
-	 * The map will be width=x*2 and length=x*2
 	 * The seed is used to seed a random number generator
 	 * The seed also calculates the other generation values as well
 	 */
-	public SimplexNoiseGenerator(int hSize, int seed) {
-		this.hSize = hSize;
-		this.aSize = hSize * 2;
+	public SimplexNoiseGenerator(int size, int seed) {
+		this.size = size;
 		this.seed = seed;
 	}
 	
@@ -72,7 +70,7 @@ public class SimplexNoiseGenerator implements Runnable {
 	public void run() {
 		if(isInitialized) {
 			this.generatorStatus = 0;
-			this.floatMap = new FloatMap(aSize, -1.0F, 1.0F);
+			this.floatMap = new FloatMap(size, -1.0F, 1.0F);
 			int returnCode = this.getSimplexNoise();
 			this.generatorStatus = (returnCode == 0 ? 1 : -1);
 		}
@@ -92,8 +90,8 @@ public class SimplexNoiseGenerator implements Runnable {
 	 */
 	private int getSimplexNoise() {
 		boolean safetySwitch = true;
-		for (int x = 0; x < this.aSize; x++) {
-			for (int y = 0; y < this.aSize; y++) {
+		for (int x = 0; x < this.size; x++) {
+			for (int y = 0; y < this.size; y++) {
 				float val = (float) this.getNoise2D(x, y);
 				if (val > 1.0F) {
 					val = 1.0F;

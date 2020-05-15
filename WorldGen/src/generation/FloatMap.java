@@ -67,7 +67,25 @@ public class FloatMap {
 		}
 	}
 	
-	//Changes noise values from -1.0 to 1.0 into 0.0 to 1.0 according to the exponent
+	//Changes noise values from -1.0F to 1.0F into 0.0F to 1.0F
+	public void adjustRange(float nmin, float nmax) {
+		float[][] scaled = new float[size][size];
+		// Loop through all values
+		for (int x = 0; x < size; x++) {
+			for (int y = 0; y < size; y++) {
+				// Rescale value
+				scaled[x][y] = (float) ((float) ((nmax - nmin) * (float) (map[x][y] - MIN_VALUE)) / (float) (MAX_VALUE - MIN_VALUE))
+						+ (float) nmin;
+			}
+		}
+
+		// Set globals
+		this.map = scaled;
+		this.MIN_VALUE = nmin;
+		this.MAX_VALUE = nmax;
+	}
+	
+	//Changes noise values from according to the exponent
 	public void redistributeNoise(float exponent) {
 		for(int x = 0; x < size; x++) {
 			for(int y = 0; y < size; y++) {

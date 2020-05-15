@@ -6,16 +6,15 @@ import graphics.ImageGenerator;
 
 public class WorldGenerator implements Runnable {
 
-	private int size, seed, numOctaves;
-	private double persistence;
+	private int size, seed;
+	private GenerationParameters genParams;
 	private World world;
 	private Random random;
 	
-	public WorldGenerator(int size, int seed, int numOctaves, double persistence) {
-		this.size = size;
-		this.seed = seed;
-		this.numOctaves = numOctaves;
-		this.persistence = persistence;
+	public WorldGenerator(GenerationParameters genParams) {
+		this.genParams = genParams;
+		this.size = genParams.getWorldSize();
+		this.seed = genParams.getWorldSeed();
 	}
 	
 	@Override
@@ -30,7 +29,7 @@ public class WorldGenerator implements Runnable {
 		 */
 		
 		MaskGenerator maskGenerator = new MaskGenerator(seed);
-		FloatMap circularMask = maskGenerator.getCircularMask(size, 0.9F);
+		FloatMap circularMask = maskGenerator.getCircularMask(size, 0.8F);
 		
 		/*
 		 * Create 2 SimplexNoiseGenerators for each quadrant
@@ -38,24 +37,27 @@ public class WorldGenerator implements Runnable {
 		
 		Thread[] simplexThreads = new Thread[2];
 		SimplexNoiseGenerator[] simplexGenerators = new SimplexNoiseGenerator[2];
-		for(int st = 0; st < 2; st++) {
-			simplexGenerators[st] = new SimplexNoiseGenerator(size / 2, random.nextInt());
-			simplexGenerators[st].setParameters(numOctaves, persistence);
-			simplexThreads[st] = new Thread(simplexGenerators[st]);
-			simplexThreads[st].start();
+		simplexGenerators[0] = new SimplexNoiseGenerator(size, random.nextInt());
+		simplexGenerators[0].setParameters(genParams.getElevationOctaves(), genParams.getElevationPersistence());
+		simplexThreads[0] = new Thread(simplexGenerators[0]);
+		simplexThreads[0].start();
+		
+		simplexGenerators[1] = new SimplexNoiseGenerator(size, random.nextInt());
+		simplexGenerators[1].setParameters(genParams.getMoistureOctaves(), genParams.getMoisturePersistence());
+		simplexThreads[1] = new Thread(simplexGenerators[1]);
+		simplexThreads[1].start();
+		
+		try {
+			simplexThreads[0].join();
+			simplexThreads[1].join();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
 		}
 		
-		while(simplexGenerators[0].getStatus() != 1 && simplexGenerators[1].getStatus() != 1) {
-			try {
-				Thread.currentThread().sleep(200);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-				return -3;
-			}
-		}
-		
+		simplexGenerators[0].getFloatMap().adjustRange(0.0F, 1.0F);
 		FloatMap elevationMap = FloatMap.combineMaps(circularMask, simplexGenerators[0].getFloatMap());
 		FloatMap temperatureMap = simplexGenerators[1].getFloatMap();
+		temperatureMap.adjustRange(0.0F, 1.0F);
 		Biome[][] biomeMap = new Biome[size][size];
 		
 		for(int x = 0; x < size; x++) {
@@ -67,14 +69,19 @@ public class WorldGenerator implements Runnable {
 						}
 					}
 				}
+				
+				if(biomeMap[x][y] == null) {
+					System.out.println("biome null");
+				}
 			}
 		}
 		
 		this.world = new World(this.seed, elevationMap, temperatureMap, biomeMap);
 		
-		ImageGenerator imageGenerator = new ImageGenerator("world.png", this.world);
+		ImageGenerator imageGenerator = new ImageGenerator(genParams.getImageExportPath(), this.world);
 		Thread imageThread = new Thread(imageGenerator);
 		imageThread.start();
+		
 		try {
 			imageThread.join();
 			return 0;

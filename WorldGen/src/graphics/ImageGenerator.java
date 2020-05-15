@@ -17,6 +17,7 @@ public class ImageGenerator implements Runnable {
 	
 	@Override
 	public void run() {
+		System.out.println(imageFile.getAbsolutePath());
 		int returnCode = writeImage();
 	}
 	
@@ -26,6 +27,7 @@ public class ImageGenerator implements Runnable {
 		for(int x = 0; x < world.getWorldSize(); x++) {
 			for(int y = 0; y < world.getWorldSize(); y++) {
 				if(world.getBiomeMap()[x][y] == null) {
+					System.out.println("null error");
 					return -2;
 				}
 				
@@ -36,6 +38,7 @@ public class ImageGenerator implements Runnable {
 		try {
 			//Write created image to the disk in the PNG format
 			ImageIO.write(image, "png", this.imageFile);
+			System.out.println("done");
 			return 0;
 		} catch (Exception e) {
 			e.printStackTrace();
